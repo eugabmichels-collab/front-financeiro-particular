@@ -1,33 +1,31 @@
 'use client'
 
+import { MoreHorizontal, Pencil, Plus, Tags, Trash2 } from 'lucide-react'
 import * as React from 'react'
-import { Plus, Tags, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Header } from '@/components/layout/header'
-import { useFilters } from '@/hooks/use-filters'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Separator } from '@/components/ui/separator'
 
 import { categorias as mockCategorias } from '@/data/mock-data'
 import type { Categoria } from '@/types'
 
 export default function CategoriasPage() {
-  const { mes, ano, mesAnterior, proximoMes } = useFilters()
   const [categorias, setCategorias] = React.useState(mockCategorias)
 
   // Group categories by type
@@ -53,10 +51,7 @@ export default function CategoriasPage() {
   return (
     <>
       <Header
-        mes={mes}
-        ano={ano}
-        onMesAnterior={mesAnterior}
-        onProximoMes={proximoMes}
+        hasDate={false}
         titulo="Categorias"
       />
       <main className="flex flex-1 flex-col gap-6 p-4 md:p-6">

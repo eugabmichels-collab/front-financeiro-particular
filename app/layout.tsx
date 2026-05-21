@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Caixa Clara - Controle Financeiro Pessoal',
+  title: 'Financeiro Particular - Controle Financeiro Pessoal',
   description: 'Sistema de controle financeiro pessoal completo. Gerencie receitas, despesas, cartões, investimentos e muito mais.',
   generator: 'v0.app',
   icons: {
