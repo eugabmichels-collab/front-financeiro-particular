@@ -1,8 +1,5 @@
 'use client'
 
-
-import { useFinancialAreas } from '@/hooks/use-financial-areas'
-
 import { LancamentosRecentes } from '@/components/cards/lancamentos-recentes'
 import { SummaryCards } from '@/components/cards/summary-card'
 import { EvolucaoMensalChart } from '@/components/charts/evolucao-mensal-chart'
@@ -22,6 +19,7 @@ import {
   calcularTotalReceitas,
   filtrarPorMesAno,
 } from '@/lib/calculations'
+import { useFinancialAreas } from '@/hooks/use-financial-areas'
 
 export default function DashboardPage() {
   const { mes, ano, mesAnterior, proximoMes } = useFilters()
