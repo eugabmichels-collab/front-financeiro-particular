@@ -1,6 +1,8 @@
 'use client'
 
 
+import { useFinancialAreas } from '@/hooks/use-financial-areas'
+
 import { LancamentosRecentes } from '@/components/cards/lancamentos-recentes'
 import { SummaryCards } from '@/components/cards/summary-card'
 import { EvolucaoMensalChart } from '@/components/charts/evolucao-mensal-chart'
@@ -8,12 +10,12 @@ import { GastosCategoriaChart } from '@/components/charts/gastos-categoria-chart
 import { Header } from '@/components/layout/header'
 import { useFilters } from '@/hooks/use-filters'
 
-import { categorias, gastosFixos, investimentos, lancamentos, lancamentosApartamento } from '@/data/mock-data'
+import { categorias, gastosFixos, investimentos, lancamentos } from '@/data/mock-data'
 import {
+  calcularTotalAreasFinanceiras,
   calcularEvolucaoMensal,
   calcularGastosVariaveis,
   calcularPorCategoria,
-  calcularTotaisApartamento,
   calcularTotalDespesas,
   calcularTotalGastosFixos,
   calcularTotalInvestido,
@@ -23,6 +25,7 @@ import {
 
 export default function DashboardPage() {
   const { mes, ano, mesAnterior, proximoMes } = useFilters()
+  const { areasFinanceiras } = useFinancialAreas()
 
   // Filter data by month/year
   const lancamentosMes = filtrarPorMesAno(lancamentos, mes, ano)
@@ -42,8 +45,7 @@ export default function DashboardPage() {
   // Investments total
   const investimentoTotal = calcularTotalInvestido(investimentos)
 
-  // Apartment totals
-  const apartamentoTotais = calcularTotaisApartamento(lancamentosApartamento)
+  const areasFinanceirasTotal = calcularTotalAreasFinanceiras(areasFinanceiras)
 
   // Expenses by category
   const gastosPorCategoria = calcularPorCategoria(lancamentosMes, categorias)
@@ -75,7 +77,7 @@ export default function DashboardPage() {
           gastosVariaveisTotal={gastosVariaveisTotal}
           faturaCartaoTotal={faturaCartaoTotal}
           investimentoTotal={investimentoTotal}
-          apartamentoTotal={apartamentoTotais.pago}
+          areasFinanceirasTotal={areasFinanceirasTotal}
         />
 
         {/* Charts Row */}

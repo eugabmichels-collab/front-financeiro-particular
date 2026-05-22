@@ -116,7 +116,7 @@ interface SummaryCardsProps {
   gastosVariaveisTotal: number
   faturaCartaoTotal: number
   investimentoTotal: number
-  apartamentoTotal: number
+  areasFinanceirasTotal: number
 }
 
 export function SummaryCards({
@@ -127,7 +127,7 @@ export function SummaryCards({
   gastosVariaveisTotal,
   faturaCartaoTotal,
   investimentoTotal,
-  apartamentoTotal,
+  areasFinanceirasTotal,
 }: SummaryCardsProps) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -181,11 +181,11 @@ export function SummaryCards({
         subtitle="patrimônio total"
       />
       <SummaryCard
-        title="Apartamento"
-        value={apartamentoTotal}
+        title="Finanças Extras"
+        value={areasFinanceirasTotal}
         icon={Building2}
         variant="apartamento"
-        subtitle="total pago"
+        subtitle="áreas personalizadas"
       />
     </div>
   )

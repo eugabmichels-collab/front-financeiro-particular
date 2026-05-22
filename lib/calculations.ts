@@ -3,10 +3,12 @@
 // =====================================
 
 import type { 
+  AreaFinanceira,
   Lancamento, 
   GastoFixo, 
   Cartao, 
   Investimento, 
+  LancamentoAreaFinanceira,
   LancamentoApartamento,
   Categoria 
 } from '@/types'
@@ -143,6 +145,29 @@ export function calcularTotaisApartamento(lancamentos: LancamentoApartamento[]):
   pendente: number
   previsto: number
 } {
+  return calcularTotaisAreaFinanceira(
+    lancamentos.map((lancamento) => ({
+      id: lancamento.id,
+      data: lancamento.data,
+      tipo: lancamento.tipo,
+      descricao: lancamento.descricao,
+      categoriaId: lancamento.categoria,
+      valor: lancamento.valor,
+      status: lancamento.status,
+      formaPagamento: lancamento.formaPagamento,
+      contaId: lancamento.contaId,
+      cartaoId: lancamento.cartaoId,
+      observacao: lancamento.observacao,
+    }))
+  )
+}
+
+export function calcularTotaisAreaFinanceira(lancamentos: LancamentoAreaFinanceira[]): {
+  total: number
+  pago: number
+  pendente: number
+  previsto: number
+} {
   const total = lancamentos.reduce((acc, l) => acc + l.valor, 0)
   const pago = lancamentos
     .filter(l => l.status === 'pago')
@@ -155,6 +180,10 @@ export function calcularTotaisApartamento(lancamentos: LancamentoApartamento[]):
     .reduce((acc, l) => acc + l.valor, 0)
   
   return { total, pago, pendente, previsto }
+}
+
+export function calcularTotalAreasFinanceiras(areas: AreaFinanceira[]): number {
+  return areas.reduce((acc, area) => acc + calcularTotaisAreaFinanceira(area.lancamentos).pago, 0)
 }
 
 /**

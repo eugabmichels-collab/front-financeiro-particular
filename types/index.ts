@@ -11,6 +11,17 @@ export type TipoLancamento = 'receita' | 'despesa' | 'investimento' | 'transfere
 export type StatusLancamento = 'pago' | 'pendente' | 'previsto' | 'atrasado'
 export type FormaPagamento = 'pix' | 'debito' | 'credito' | 'dinheiro' | 'transferencia' | 'boleto'
 export type TipoInvestimento = 'cdb' | 'fgts' | 'previdencia' | 'tesouro' | 'fundos' | 'acoes' | 'outros'
+export type IconeAreaFinanceira =
+  | 'building2'
+  | 'car-front'
+  | 'plane'
+  | 'home'
+  | 'briefcase-business'
+  | 'wallet'
+  | 'landmark'
+  | 'graduation-cap'
+  | 'heart-handshake'
+  | 'rocket'
 export type CategoriaApartamento = 
   | 'entrada' 
   | 'parcelas' 
@@ -156,6 +167,38 @@ export interface AporteInvestimento {
   data: Date
   valor: number
   tipo: 'aporte' | 'resgate'
+}
+
+export interface CategoriaAreaFinanceira {
+  id: string
+  nome: string
+  cor: string
+}
+
+export interface LancamentoAreaFinanceira {
+  id: string
+  data: Date | string
+  tipo: 'pagamento' | 'reserva' | 'gasto'
+  descricao: string
+  categoriaId: string
+  valor: number
+  status: 'pago' | 'pendente' | 'previsto'
+  formaPagamento: FormaPagamento
+  contaId?: string
+  cartaoId?: string
+  observacao?: string
+}
+
+export interface AreaFinanceira {
+  id: string
+  slug: string
+  nome: string
+  descricao?: string
+  cor: string
+  icone: IconeAreaFinanceira
+  categorias: CategoriaAreaFinanceira[]
+  lancamentos: LancamentoAreaFinanceira[]
+  fixa?: boolean
 }
 
 // =====================================

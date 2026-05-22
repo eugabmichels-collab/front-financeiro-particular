@@ -10,13 +10,11 @@ import {
   CreditCard,
   CalendarClock,
   PiggyBank,
-  Building2,
   Tags,
   Settings,
   Wallet,
 } from 'lucide-react'
 
-import { cn } from '@/lib/utils'
 import {
   Sidebar,
   SidebarContent,
@@ -30,6 +28,8 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from '@/components/ui/sidebar'
+import { useFinancialAreas } from '@/hooks/use-financial-areas'
+import { getFinancialAreaIcon } from '@/lib/financial-areas'
 
 const mainNavItems = [
   {
@@ -70,11 +70,6 @@ const financeNavItems = [
     url: '/investimentos',
     icon: PiggyBank,
   },
-  {
-    title: 'Apartamento',
-    url: '/apartamento',
-    icon: Building2,
-  },
 ]
 
 const configNavItems = [
@@ -92,6 +87,13 @@ const configNavItems = [
 
 export function AppSidebar() {
   const pathname = usePathname()
+  const { areasFinanceiras } = useFinancialAreas()
+
+  const dynamicFinanceNavItems = areasFinanceiras.map((area) => ({
+    title: area.nome,
+    url: `/financas/${area.slug}`,
+    icon: getFinancialAreaIcon(area.icone),
+  }))
 
   return (
     <Sidebar collapsible="icon">
@@ -142,6 +144,20 @@ export function AppSidebar() {
             <SidebarMenu>
               {financeNavItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === item.url}
+                    tooltip={item.title}
+                  >
+                    <Link href={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+              {dynamicFinanceNavItems.map((item) => (
+                <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton
                     asChild
                     isActive={pathname === item.url}

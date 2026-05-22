@@ -1,9 +1,22 @@
 'use client'
 
-import { Bell, Database, Palette, User, Wallet } from 'lucide-react'
+import * as React from 'react'
+import { Bell, Database, FolderKanban, Palette, Pencil, Trash2, User, Wallet } from 'lucide-react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 
 import { Header } from '@/components/layout/header'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -23,6 +36,9 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
+import { useFinancialAreas } from '@/hooks/use-financial-areas'
+import { financialAreaIconOptions, getFinancialAreaIcon } from '@/lib/financial-areas'
+import type { IconeAreaFinanceira } from '@/types'
 
 interface ConfiguracoesFormValues {
   nome: string
@@ -36,7 +52,26 @@ interface ConfiguracoesFormValues {
   temaEscuro: boolean
 }
 
+interface FinanceAreaEditorState {
+  id?: string
+  nome: string
+  descricao: string
+  cor: string
+  icone: IconeAreaFinanceira
+  categorias: string
+}
+
+const INITIAL_FINANCE_AREA_FORM: FinanceAreaEditorState = {
+  nome: '',
+  descricao: '',
+  cor: '#0f766e',
+  icone: 'building2',
+  categorias: '',
+}
+
 export default function ConfiguracoesPage() {
+  const { areasFinanceiras, createArea, updateArea, removeArea } = useFinancialAreas()
+  const [financeAreaForm, setFinanceAreaForm] = React.useState<FinanceAreaEditorState>(INITIAL_FINANCE_AREA_FORM)
 
   const form = useForm<ConfiguracoesFormValues>({
     defaultValues: {
@@ -52,7 +87,82 @@ export default function ConfiguracoesPage() {
     },
   })
 
-  const handleSubmit = (_values: ConfiguracoesFormValues) => undefined
+  const handleSubmit = (_values: ConfiguracoesFormValues) => {
+    toast.success('Configurações salvas')
+  }
+
+  const isEditingFinanceArea = Boolean(financeAreaForm.id)
+
+  const resetFinanceAreaForm = () => {
+    setFinanceAreaForm(INITIAL_FINANCE_AREA_FORM)
+  }
+
+  const handleFinanceAreaChange = <K extends keyof FinanceAreaEditorState>(field: K, value: FinanceAreaEditorState[K]) => {
+    setFinanceAreaForm((current) => ({
+      ...current,
+      [field]: value,
+    }))
+  }
+
+  const handleFinanceAreaSubmit = () => {
+    if (!financeAreaForm.nome.trim()) {
+      toast.error('Informe um nome para a área financeira')
+      return
+    }
+
+    const payload = {
+      nome: financeAreaForm.nome,
+      descricao: financeAreaForm.descricao,
+      cor: financeAreaForm.cor,
+      icone: financeAreaForm.icone,
+      categorias: financeAreaForm.categorias
+        .split(',')
+        .map((categoria) => categoria.trim())
+        .filter(Boolean),
+    }
+
+    if (financeAreaForm.id) {
+      updateArea(financeAreaForm.id, payload)
+      toast.success('Área financeira atualizada')
+    } else {
+      createArea(payload)
+      toast.success('Área financeira criada')
+    }
+
+    resetFinanceAreaForm()
+  }
+
+  const handleFinanceAreaEdit = (areaId: string) => {
+    const area = areasFinanceiras.find((item) => item.id === areaId)
+
+    if (!area) {
+      return
+    }
+
+    setFinanceAreaForm({
+      id: area.id,
+      nome: area.nome,
+      descricao: area.descricao || '',
+      cor: area.cor,
+      icone: area.icone,
+      categorias: area.categorias.map((categoria) => categoria.nome).join(', '),
+    })
+  }
+
+  const handleFinanceAreaDelete = (areaId: string) => {
+    const removed = removeArea(areaId)
+
+    if (!removed) {
+      toast.error('Essa área é padrão do sistema e não pode ser excluída')
+      return
+    }
+
+    if (financeAreaForm.id === areaId) {
+      resetFinanceAreaForm()
+    }
+
+    toast.success('Área financeira removida')
+  }
 
   return (
     <>
@@ -201,6 +311,145 @@ export default function ConfiguracoesPage() {
                       </FormItem>
                     )}
                   />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FolderKanban className="size-5" />
+                  Áreas Financeiras
+                </CardTitle>
+                <CardDescription>
+                  Crie abas extras no menu para organizar objetivos como apartamento, carro ou viagem.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">
+                  <div className="space-y-4 rounded-lg border p-4">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="space-y-2 sm:col-span-2">
+                        <FormLabel>Nome da área</FormLabel>
+                        <Input
+                          placeholder="Ex.: Carro, Viagem, Reforma"
+                          value={financeAreaForm.nome}
+                          onChange={(event) => handleFinanceAreaChange('nome', event.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2 sm:col-span-2">
+                        <FormLabel>Descrição</FormLabel>
+                        <Input
+                          placeholder="Resumo rápido do objetivo dessa área"
+                          value={financeAreaForm.descricao}
+                          onChange={(event) => handleFinanceAreaChange('descricao', event.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <FormLabel>Ícone</FormLabel>
+                        <Select
+                          value={financeAreaForm.icone}
+                          onValueChange={(value) => handleFinanceAreaChange('icone', value as IconeAreaFinanceira)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {financialAreaIconOptions.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <FormLabel>Cor</FormLabel>
+                        <Input
+                          type="color"
+                          value={financeAreaForm.cor}
+                          onChange={(event) => handleFinanceAreaChange('cor', event.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2 sm:col-span-2">
+                        <FormLabel>Categorias iniciais</FormLabel>
+                        <Input
+                          placeholder="Ex.: entrada, parcelas, seguro"
+                          value={financeAreaForm.categorias}
+                          onChange={(event) => handleFinanceAreaChange('categorias', event.target.value)}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Opcional. Use vírgulas para separar categorias básicas dessa área.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-3">
+                      <Button type="button" onClick={handleFinanceAreaSubmit}>
+                        {isEditingFinanceArea ? 'Salvar Área' : 'Criar Área'}
+                      </Button>
+                      {isEditingFinanceArea && (
+                        <Button type="button" variant="outline" onClick={resetFinanceAreaForm}>
+                          Cancelar edição
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    {areasFinanceiras.map((area) => {
+                      const Icon = getFinancialAreaIcon(area.icone)
+
+                      return (
+                        <div key={area.id} className="rounded-lg border p-4">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Icon className="size-4" style={{ color: area.cor }} />
+                                <p className="font-medium">{area.nome}</p>
+                              </div>
+                              <p className="text-sm text-muted-foreground">
+                                {area.descricao || 'Sem descrição informada'}
+                              </p>
+                              <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                                <span>Rota: /financas/{area.slug}</span>
+                                <span>{area.categorias.length} categorias</span>
+                                <span>{area.lancamentos.length} lançamentos</span>
+                                {area.fixa && <span>Padrão do sistema</span>}
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button type="button" variant="outline" size="sm" onClick={() => handleFinanceAreaEdit(area.id)}>
+                                <Pencil className="mr-2 size-4" />
+                                Editar
+                              </Button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button type="button" variant="outline" size="sm" disabled={area.fixa}>
+                                    <Trash2 className="mr-2 size-4" />
+                                    Excluir
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Excluir área financeira?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Essa ação remove a aba do menu e a organização associada a essa área.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleFinanceAreaDelete(area.id)}>
+                                      Excluir área
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
               </CardContent>
             </Card>

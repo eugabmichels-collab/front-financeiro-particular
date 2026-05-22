@@ -4,6 +4,7 @@
 // =====================================
 
 import type {
+  AreaFinanceira,
   Categoria,
   Cartao,
   Conta,
@@ -543,6 +544,47 @@ export const lancamentosApartamento: LancamentoApartamento[] = [
     valor: 25000,
     status: 'previsto',
     formaPagamento: 'transferencia',
+  },
+]
+
+export const areasFinanceirasIniciais: AreaFinanceira[] = [
+  {
+    id: 'finance-apartamento',
+    slug: 'apartamento',
+    nome: 'Apartamento',
+    descricao: 'Acompanhe parcelas, documentação e reservas do imóvel.',
+    cor: '#0f766e',
+    icone: 'building2',
+    fixa: true,
+    categorias: [
+      { id: 'entrada', nome: 'Entrada', cor: 'oklch(0.55 0.15 250)' },
+      { id: 'parcelas', nome: 'Parcelas', cor: 'oklch(0.60 0.15 155)' },
+      { id: 'financiamento', nome: 'Financiamento', cor: 'oklch(0.55 0.15 300)' },
+      { id: 'documentacao', nome: 'Documentação', cor: 'oklch(0.65 0.15 70)' },
+      { id: 'cartorio', nome: 'Cartório', cor: 'oklch(0.55 0.12 195)' },
+      { id: 'itbi', nome: 'ITBI', cor: 'oklch(0.58 0.16 25)' },
+      { id: 'escritura', nome: 'Escritura', cor: 'oklch(0.50 0.15 180)' },
+      { id: 'obra', nome: 'Obra', cor: 'oklch(0.55 0.12 40)' },
+      { id: 'reforma', nome: 'Reforma', cor: 'oklch(0.60 0.12 100)' },
+      { id: 'moveis', nome: 'Móveis', cor: 'oklch(0.50 0.15 220)' },
+      { id: 'eletrodomesticos', nome: 'Eletrodomésticos', cor: 'oklch(0.55 0.12 260)' },
+      { id: 'condominio', nome: 'Condomínio', cor: 'oklch(0.60 0.10 330)' },
+      { id: 'reserva', nome: 'Reserva', cor: 'oklch(0.50 0.12 120)' },
+      { id: 'outros', nome: 'Outros', cor: 'oklch(0.50 0.05 260)' },
+    ],
+    lancamentos: lancamentosApartamento.map((lancamento) => ({
+      id: lancamento.id,
+      data: lancamento.data,
+      tipo: lancamento.tipo,
+      descricao: lancamento.descricao,
+      categoriaId: lancamento.categoria,
+      valor: lancamento.valor,
+      status: lancamento.status,
+      formaPagamento: lancamento.formaPagamento,
+      contaId: lancamento.contaId,
+      cartaoId: lancamento.cartaoId,
+      observacao: lancamento.observacao,
+    })),
   },
 ]
 
